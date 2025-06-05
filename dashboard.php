@@ -12,13 +12,23 @@ $login_count = $_SESSION['login_count'];
 $register_success = '';
 $register_error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $new_user = trim($_POST['nama'] ?? '');
-    $new_pass = trim($_POST['umur'] ?? '');
+if (!isset($_SESSION['daftar'])) {
+    $_SESSION['daftar'] = []; // inisialisasi jika belum ada
+}
 
-    if ($new_user && $new_pass) {
-        // Simulasi pendaftaran (belum disimpan ke database)
-        $register_success = "Pengguna <strong>" . htmlspecialchars($new_user) . "</strong> berhasil didaftarkan (simulasi).";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama = trim($_POST['nama'] ?? '');
+    $umur = trim($_POST['umur'] ?? '');
+
+    if ($nama && $umur) {
+        $daftar = [
+            "nama" => $nama,
+            "umur" => $umur
+        ];
+
+        $_SESSION['daftar'][] = $daftar;
+
+        $register_success = "Pengguna <strong>" . htmlspecialchars($nama) . "</strong> berhasil didaftarkan.";
     } else {
         $register_error = "Semua field harus diisi.";
     }
@@ -27,18 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Poppins', sans-serif;
             background: #f7f9fc;
@@ -55,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             text-align: center;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
         }
 
         h1 {
@@ -80,8 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: left;
         }
 
-        input[type="text"],
-        input[type="number"] {
+        input[type="text"], input[type="number"] {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid #ccc;
@@ -114,9 +116,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .logout-btn:hover {
             background-color: #c0392b;
         }
+
+        .message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .error {
+            background-color: #fdecea;
+            color: #c62828;
+        }
+
+        .user-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .user-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .user-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
     </style>
 </head>
-
 <body>
     <div class="card">
         <h1>👋 Selamat Datang, <span class="highlight"><?= htmlspecialchars($username); ?></span></h1>
@@ -135,10 +169,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
         </form>
 
+        <div class="user-list">
+            <div class="section-title">👥 Daftar Pengguna:</div>
+            <ul>
+                <?php foreach ($_SESSION['daftar'] as $user): ?>
+                    <li><?= htmlspecialchars($user['nama']) ?> (<?= htmlspecialchars($user['umur']) ?> tahun)</li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
         <form action="logout.php" method="post">
             <button type="submit" class="logout-btn">Logout</button>
         </form>
     </div>
 </body>
-
 </html>
