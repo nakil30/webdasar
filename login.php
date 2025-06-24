@@ -4,10 +4,10 @@ session_start();
 $error = "";
 
 if (isset($_POST['username']) && isset($_POST['password'])) {
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
-
-    if ($username === "usm" && $password === "123") {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    if ($username == "usm" && $password == "123") {
+        // Set session variable
         $_SESSION['username'] = $username;
         $_SESSION['login_count'] = ($_SESSION['login_count'] ?? 0) + 1;
         header("Location: dashboard.php");
