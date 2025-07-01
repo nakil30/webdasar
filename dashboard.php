@@ -4,6 +4,10 @@ if (!isset($_SESSION['username'])) {
     // User is already logged in, redirect to welcome page  
     header("Location: login.php");
 
+session_start();
+session_destroy();
+header("Location: login.php");
+exit();
     exit();
 
 }
